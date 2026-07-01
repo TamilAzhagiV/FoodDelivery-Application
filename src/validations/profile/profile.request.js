@@ -1,0 +1,87 @@
+const { z } = require("zod");
+
+const emailSchema = require("../common/email.schema");
+const phoneSchema = require("../common/phone.schema");
+
+const getProfileSchema = z.object({});
+
+const updateProfileSchema = z.object({
+    body: z.object({
+
+        // ===========================
+        // Customer Profile
+        // ===========================
+        addresses: z.string().optional(),
+        preferences: z.string().optional(),
+
+        // ===========================
+        // Restaurant Profile
+        // ===========================
+        restaurantName: z.string().min(3).max(100).optional(),
+
+        description: z.string().max(500).optional(),
+
+        cuisineTypes: z.string().optional(),
+
+        tags: z.string().optional(),
+
+        businessPhoneNumber: phoneSchema.optional(),
+
+        businessEmail: emailSchema.optional(),
+
+        supportPhoneNumber: phoneSchema.optional(),
+
+        supportEmail: emailSchema.optional(),
+
+        address: z.string().optional(),
+
+        gstNumber: z.string().trim().optional(),
+
+        fssaiLicenseNumber: z.string().trim().optional(),
+
+        fssaiExpiryDate: z.string().optional(),
+
+        bankDetails: z.string().optional(),
+
+        deliveryRadius: z.coerce.number().min(0).optional(),
+
+        averagePreparationTime: z.coerce.number().min(1).optional(),
+
+        minimumOrderAmount: z.coerce.number().min(0).optional(),
+
+        freeDeliveryAbove: z.coerce.number().min(0).optional(),
+
+        operatingHours: z.string().optional(),
+
+        // ===========================
+        // Delivery Partner
+        // ===========================
+        dateOfBirth: z.string().optional(),
+
+        emergencyContactNumber: phoneSchema.optional(),
+
+        aadhaarNumber: z.string().trim().optional(),
+
+        vehicleType: z.enum([
+            "BIKE",
+            "SCOOTER",
+            "CAR"
+        ]).optional(),
+
+        vehicleNumber: z.string().trim().optional(),
+
+        vehicleModel: z.string().trim().optional(),
+
+        drivingLicenseNumber: z.string().trim().optional(),
+
+        drivingLicenseExpiryDate: z.string().optional(),
+
+        currentLocation: z.string().optional()
+
+    }).strict()
+});
+
+module.exports = {
+    getProfileSchema,
+    updateProfileSchema
+};
