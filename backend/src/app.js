@@ -23,8 +23,6 @@ const app = express();
 /* Middlewares */
 app.use(cors());
 app.use(express.json());
-
-/* Swagger */
 app.use("/api-docs",swaggerUi.serve,swaggerUi.setup(swaggerSpec));
 
 /* Routes */
