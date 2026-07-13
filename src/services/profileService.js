@@ -2,6 +2,7 @@ const User = require("../models/User");
 const CustomerProfile = require("../models/CustomerProfile");
 const Restaurant = require("../models/Restaurant");
 const DeliveryPartner = require("../models/DeliveryPartner");
+const bcrypt = require("bcryptjs");
 
 const getProfile = async (userId) => {
     const user = await User.findById(userId);
@@ -88,7 +89,72 @@ const updateProfile = async (userId, profileData) => {
     }
 };
 
+const changePassword = async (userId,
+    {
+        currentPassword,
+        newPassword
+    }) => {
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const isPasswordValid =await bcrypt.compare(currentPassword,
+            user.password
+        );
+
+    if (!isPasswordValid) {
+        throw new Error("Current password is incorrect");
+    }
+
+    const hashedPassword =await bcrypt.hash(newPassword,10);
+
+    user.password = hashedPassword;
+    user.refreshToken = null;
+    await user.save();
+    return;
+
+};
+
+const deleteAccount = async (userId) => {
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (user.status === "INACTIVE") {
+        throw new Error("Account already deleted");
+    }
+
+    user.status = "INACTIVE";
+    user.refreshToken = null;
+
+    await user.save();
+
+};
+
+const logoutAll = async (userId) => {
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    user.refreshToken = null;
+
+    await user.save();
+
+};
+
 module.exports = {
     getProfile,
-    updateProfile
+    updateProfile,
+    changePassword,
+    deleteAccount,
+    logoutAll
 };

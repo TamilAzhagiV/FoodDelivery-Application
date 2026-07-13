@@ -199,4 +199,117 @@
  *       404:
  *         description: Profile Not Found
  */
+/**
+ * @swagger
+ * /profile/change-password:
+ *   patch:
+ *     summary: Change password
+ *     description: Allows an authenticated user to change their account password.
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *               - confirmPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 example: OldPassword@123
+ *               newPassword:
+ *                 type: string
+ *                 example: NewPassword@123
+ *               confirmPassword:
+ *                 type: string
+ *                 example: NewPassword@123
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               message: Password changed successfully
+ *       400:
+ *         description: Validation Error
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: false
+ *               message: Confirm password does not match
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: false
+ *               message: Invalid Token
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             examples:
+ *               incorrectPassword:
+ *                 value:
+ *                   success: false
+ *                   message: Current password is incorrect
+ *               userNotFound:
+ *                 value:
+ *                   success: false
+ *                   message: User not found
+ */
+/**
+ * @swagger
+ * /profile:
+ *   delete:
+ *     summary: Delete account
+ *     description: Soft deletes the authenticated user's account by marking it as inactive.
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Account deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               message: Account deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal Server Error
+ */
+/**
+ * @swagger
+ * /profile/logout-all:
+ *   post:
+ *     summary: Logout from all devices
+ *     description: Invalidates the authenticated user's refresh token, requiring all devices to log in again.
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged out from all devices successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               message: Logged out from all devices successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal Server Error
+ */
 

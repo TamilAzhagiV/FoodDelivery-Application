@@ -86,7 +86,117 @@ const updateProfile = async (req, res) => {
     }
 };
 
+const changePassword = async (req, res) => {
+    try {
+        await profileService.changePassword(
+            req.user.userId,
+            req.body
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Password changed successfully"
+        });
+    }
+
+    catch (error) {
+
+    if (error.message === "User not found") {
+        return res.status(404).json({
+            success: false,
+            message: error.message
+        });
+    }
+
+    if (error.message === "Current password is incorrect") {
+        return res.status(401).json({
+            success: false,
+            message: error.message
+        });
+    }
+
+    return res.status(500).json({
+        success: false,
+        message: error.message
+    });
+
+}
+}
+
+const deleteAccount = async (req, res) => {
+
+    try {
+
+        await profileService.deleteAccount(
+            req.user.userId
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Account deactivated successfully"
+        });
+
+    } catch (error) {
+
+        if (error.message === "User not found") {
+            return res.status(404).json({
+                success: false,
+                message: error.message
+            });
+        }
+
+        if (error.message === "Account already deleted") {
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+
+const logoutAll = async (req, res) => {
+
+    try {
+
+        await profileService.logoutAll(
+            req.user.userId
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Logged out from all devices successfully"
+        });
+
+    } catch (error) {
+
+        if (error.message === "User not found") {
+            return res.status(404).json({
+                success: false,
+                message: error.message
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+
+
 module.exports = {
     getProfile,
-    updateProfile
+    updateProfile,
+    changePassword,
+    deleteAccount,
+    logoutAll
 };

@@ -86,14 +86,16 @@ const deliveryPartnerSchema = new mongoose.Schema(
     },
 
     currentLocation: {
-        latitude: {
-            type: Number
-        },
-
-        longitude: {
-            type: Number
-        }
+    type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point"
     },
+    coordinates: {
+        type: [Number],
+        default: [0, 0]
+    }
+},
 
     availabilityStatus: {
         type: String,
@@ -164,6 +166,17 @@ const deliveryPartnerSchema = new mongoose.Schema(
         type: Boolean,
         default: false
     },
+    blockedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+},
+
+blockedAt: {
+    type: Date,
+    default: null
+},
+    
 
     blockedReason: {
         type: String
@@ -176,6 +189,15 @@ const deliveryPartnerSchema = new mongoose.Schema(
         "REJECTED"
     ],
     default: "PENDING"
+},
+totalOrdersOffered: {
+    type: Number,
+    default: 0
+},
+
+acceptedOrders: {
+    type: Number,
+    default: 0
 },
 
 approvedBy: {
@@ -209,6 +231,9 @@ rejectionReason: {
     timestamps: true
 }
 );
+deliveryPartnerSchema.index({
+    currentLocation: "2dsphere"
+});
 
 module.exports = mongoose.model(
     "DeliveryPartner",

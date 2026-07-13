@@ -2,15 +2,15 @@
  * @swagger
  * tags:
  *   name: Orders
- *   description: Order Management APIs for Customers
+ *   description: Customer Order APIs
  */
 
 /**
  * @swagger
  * /orders:
  *   post:
- *     summary: Place Order
- *     description: Place a new order using the items currently in the logged-in customer's cart. This will empty the cart after successful order placement.
+ *     summary: Place a Cash on Delivery (COD) Order
+ *     description: Creates an order from the customer's cart using Cash on Delivery.
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -19,45 +19,30 @@
  *         description: Order placed successfully
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Order placed successfully
- *                 data:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       example: "6850c1c6f3a5f5f4b6a12348"
- *                     customerId:
- *                       type: string
- *                       example: "6850c1c6f3a5f5f4b6a12345"
- *                     restaurantId:
- *                       type: string
- *                       example: "6850c1c6f3a5f5f4b6a12346"
- *                     items:
- *                       type: array
- *                       items:
- *                         type: object
- *                     totalAmount:
- *                       type: number
- *                       example: 500
- *                     orderStatus:
- *                       type: string
- *                       example: PLACED
+ *             example:
+ *               success: true
+ *               message: Order placed successfully
+ *               data:
+ *                 _id: "687f9d5d9bdf9d9f3d9a1234"
+ *                 customerId: "687f9a6b9bdf9d9f3d9a1111"
+ *                 restaurantId: "687f9b7c9bdf9d9f3d9a2222"
+ *                 paymentMethod: "COD"
+ *                 paymentStatus: "PENDING"
+ *                 orderStatus: "PLACED"
+ *                 totalAmount: 140
+ *                 items:
+ *                   - menuItemId: "687f9c7d9bdf9d9f3d9a3333"
+ *                     quantity: 2
+ *                     price: 70
+ *                 createdAt: "2026-07-02T10:30:00.000Z"
  *       400:
- *         description: Bad Request - e.g. Cart is empty
+ *         description: Cart is empty
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden - Customer role required
+ *       404:
+ *         description: Menu item not found
  *       500:
- *         description: Server error
+ *         description: Internal Server Error
  */
 
 /**
@@ -65,90 +50,38 @@
  * /orders:
  *   get:
  *     summary: Get Customer Orders
- *     description: Get all orders placed by the current customer, sorted newest first. Populates the restaurantId (name) and items.menuItemId (name, image).
+ *     description: Returns all orders placed by the logged-in customer.
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Orders retrieved successfully
+ *         description: Orders fetched successfully
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                         example: "6850c1c6f3a5f5f4b6a12348"
- *                       customerId:
- *                         type: string
- *                         example: "6850c1c6f3a5f5f4b6a12345"
- *                       restaurantId:
- *                         type: object
- *                         properties:
- *                           _id:
- *                             type: string
- *                             example: "6850c1c6f3a5f5f4b6a12346"
- *                           restaurantName:
- *                             type: string
- *                             example: "Gourmet Paradise"
- *                       items:
- *                         type: array
- *                         items:
- *                           type: object
- *                           properties:
- *                             menuItemId:
- *                               type: object
- *                               properties:
- *                                 _id:
- *                                   type: string
- *                                   example: "6850c1c6f3a5f5f4b6a12347"
- *                                 name:
- *                                   type: string
- *                                   example: "Paneer Butter Masala"
- *                                 image:
- *                                   type: string
- *                                   example: "paneer.jpg"
- *                             quantity:
- *                               type: integer
- *                               example: 2
- *                             price:
- *                               type: number
- *                               example: 250
- *                             _id:
- *                               type: string
- *                               example: "6850c1c6f3a5f5f4b6a1234b"
- *                       totalAmount:
- *                         type: number
- *                         example: 500
- *                       orderStatus:
- *                         type: string
- *                         example: "PLACED"
- *                       createdAt:
- *                         type: string
- *                         example: "2026-06-25T12:10:00.000Z"
+ *             example:
+ *               success: true
+ *               data:
+ *                 - _id: "687f9d5d9bdf9d9f3d9a1234"
+ *                   restaurantId:
+ *                     restaurantName: "Spicy Kitchen"
+ *                   paymentMethod: "ONLINE"
+ *                   paymentStatus: "SUCCESS"
+ *                   orderStatus: "DELIVERED"
+ *                   totalAmount: 250
+ *                   createdAt: "2026-07-02T10:30:00.000Z"
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden - Customer role required
  *       500:
- *         description: Server error
+ *         description: Internal Server Error
  */
 
 /**
  * @swagger
  * /orders/{orderId}:
  *   get:
- *     summary: Get Order Details
- *     description: Retrieve details of a specific order. Populates the restaurantId (name) and items.menuItemId (name, image).
+ *     summary: Get Order By ID
+ *     description: Returns complete details of a specific customer order.
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -158,73 +91,35 @@
  *         required: true
  *         schema:
  *           type: string
- *         description: MongoDB ObjectId of the order
+ *         example: 687f9d5d9bdf9d9f3d9a1234
  *     responses:
  *       200:
- *         description: Order details retrieved successfully
+ *         description: Order fetched successfully
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       example: "6850c1c6f3a5f5f4b6a12348"
- *                     customerId:
- *                       type: string
- *                       example: "6850c1c6f3a5f5f4b6a12345"
- *                     restaurantId:
- *                       type: object
- *                       properties:
- *                         _id:
- *                           type: string
- *                           example: "6850c1c6f3a5f5f4b6a12346"
- *                         restaurantName:
- *                           type: string
- *                           example: "Gourmet Paradise"
- *                     items:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           menuItemId:
- *                             type: object
- *                             properties:
- *                               _id:
- *                                 type: string
- *                                 example: "6850c1c6f3a5f5f4b6a12347"
- *                               name:
- *                                 type: string
- *                                 example: "Paneer Butter Masala"
- *                               image:
- *                                 type: string
- *                                 example: "paneer.jpg"
- *                           quantity:
- *                             type: integer
- *                             example: 2
- *                           price:
- *                             type: number
- *                             example: 250
- *                     totalAmount:
- *                       type: number
- *                       example: 500
- *                     orderStatus:
- *                       type: string
- *                       example: "PLACED"
+ *             example:
+ *               success: true
+ *               data:
+ *                 _id: "687f9d5d9bdf9d9f3d9a1234"
+ *                 customerId: "687f9a6b9bdf9d9f3d9a1111"
+ *                 restaurantId:
+ *                   restaurantName: "Spicy Kitchen"
+ *                 paymentMethod: "ONLINE"
+ *                 paymentStatus: "SUCCESS"
+ *                 orderStatus: "OUT_FOR_DELIVERY"
+ *                 totalAmount: 250
+ *                 items:
+ *                   - menuItemId:
+ *                       name: "Chicken Fried Rice"
+ *                       image: "https://example.com/image.jpg"
+ *                     quantity: 2
+ *                     price: 125
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden - Customer role required
  *       404:
  *         description: Order not found
  *       500:
- *         description: Server error
+ *         description: Internal Server Error
  */
 
 /**
@@ -232,7 +127,7 @@
  * /orders/{orderId}/cancel:
  *   patch:
  *     summary: Cancel Order
- *     description: Cancel an order. An order can only be cancelled if its current status is "PLACED".
+ *     description: Cancels an order if its status is PLACED.
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -242,36 +137,24 @@
  *         required: true
  *         schema:
  *           type: string
- *         description: MongoDB ObjectId of the order to cancel
+ *         example: 687f9d5d9bdf9d9f3d9a1234
  *     responses:
  *       200:
  *         description: Order cancelled successfully
  *         content:
  *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: "Order cancelled successfully"
- *                 data:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       example: "6850c1c6f3a5f5f4b6a12348"
- *                     orderStatus:
- *                       type: string
- *                       example: "CANCELLED"
+ *             example:
+ *               success: true
+ *               message: Order cancelled successfully
+ *               data:
+ *                 _id: "687f9d5d9bdf9d9f3d9a1234"
+ *                 orderStatus: "CANCELLED"
+ *       400:
+ *         description: Order cannot be cancelled
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Forbidden - Customer role required
  *       404:
  *         description: Order not found
  *       500:
- *         description: Server error - e.g. Order cannot be cancelled
+ *         description: Internal Server Error
  */

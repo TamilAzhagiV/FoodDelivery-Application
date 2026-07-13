@@ -67,6 +67,21 @@ const userSchema = new mongoose.Schema(
         ],
         default: "ACTIVE"
     },
+    blockedReason: {
+    type: String,
+    default: null
+},
+
+blockedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+},
+
+blockedAt: {
+    type: Date,
+    default: null
+},
 
     refreshToken: {
         type: String,
