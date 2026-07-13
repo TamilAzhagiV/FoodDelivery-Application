@@ -49,14 +49,21 @@ const notifyOrderReady = (io, order) => {
         );
 
     }
+};
 
-    // Notify All Active Delivery Partners
-    const deliveryPartners =
-        socketManager.getDeliveryPartners();
+const notifyNearbyDeliveryPartners = (io,order,deliveryPartners) => {
 
     for (const partner of deliveryPartners) {
 
-        io.to(partner.socketId).emit(
+        const socketId = socketManager.getSocketId(
+            partner.userId.toString()
+        );
+
+        if (!socketId) {
+            continue;
+        }
+
+        io.to(socketId).emit(
             "new-order",
             order
         );
@@ -68,5 +75,6 @@ const notifyOrderReady = (io, order) => {
 module.exports = {
     notifyOrderAccepted,
     notifyOrderPreparing,
-    notifyOrderReady
+    notifyOrderReady,
+    notifyNearbyDeliveryPartners
 };

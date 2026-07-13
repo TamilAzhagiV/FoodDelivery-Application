@@ -1,18 +1,17 @@
 const validate = (schema) => {
 
     return (req, res, next) => {
-
         const result = schema.safeParse({
 
-            body: req.body,
+    body: req.body ?? {},
 
-            params: req.params,
+    params: req.params ?? {},
 
-            query: req.query,
+    query: req.query ?? {},
 
-            headers: req.headers
+    headers: req.headers ?? {}
 
-        });
+});
 
         if (!result.success) {
 

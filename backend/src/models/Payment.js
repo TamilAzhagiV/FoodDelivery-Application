@@ -2,12 +2,10 @@ const mongoose = require("mongoose");
 
 const paymentSchema = new mongoose.Schema(
 {
-    // Order Details
     orderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Order",
-        required: true,
-        unique: true
+        default: null
     },
 
     customerId: {
@@ -16,7 +14,6 @@ const paymentSchema = new mongoose.Schema(
         required: true
     },
 
-    // Payment Information
     amount: {
         type: Number,
         required: true,
@@ -48,7 +45,6 @@ const paymentSchema = new mongoose.Schema(
         default: "PENDING"
     },
 
-    // Razorpay Details (Only for ONLINE)
     razorpayOrderId: {
         type: String,
         default: null
@@ -64,19 +60,12 @@ const paymentSchema = new mongoose.Schema(
         default: null
     },
 
-    // Transaction Details
-    transactionId: {
+  
+    failureMessage: {
         type: String,
         default: null
     },
 
-    // Failure Details
-    failureReason: {
-        type: String,
-        default: null
-    },
-
-    // Refund Details
     refundAmount: {
         type: Number,
         default: 0
@@ -92,11 +81,14 @@ const paymentSchema = new mongoose.Schema(
         default: null
     },
 
-    // Payment Time
     paidAt: {
         type: Date,
         default: null
-    }
+    },
+    expiresAt: {
+    type: Date,
+    default: () => new Date(Date.now() + 15 * 60 * 1000)
+}
 
 },
 {

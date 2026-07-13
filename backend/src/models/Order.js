@@ -68,12 +68,70 @@ const orderSchema = new mongoose.Schema(
             }
         }
     ],
+    foodTotal: {
+    type: Number,
+    required: true,
+    min: 0
+},
 
-    totalAmount: {
-        type: Number,
-        required: true,
-        min: 0
-    },
+deliveryFee: {
+    type: Number,
+    required: true,
+    default: 0,
+    min: 0
+},
+gst: {
+    type: Number,
+    required: true,
+    default: 0,
+    min: 0
+},
+deliveryPartnerEarnings: {
+    type: Number,
+    required: true,
+    default: 0,
+    min: 0
+},
+
+platformCommission: {
+    type: Number,
+    required: true,
+    default: 0,
+    min: 0
+},
+cancelledBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+},
+
+cancelledAt: {
+    type: Date,
+    default: null
+},
+
+cancellationReason: {
+    type: String,
+    default: null
+},
+
+platformFee: {
+    type: Number,
+    default: 0,
+    min: 0
+},
+
+discount: {
+    type: Number,
+    default: 0,
+    min: 0
+},
+
+totalAmount: {
+    type: Number,
+    required: true,
+    min: 0
+},
 
     orderStatus: {
         type: String,

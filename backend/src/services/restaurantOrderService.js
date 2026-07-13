@@ -1,6 +1,8 @@
 const Order = require("../models/Order");
 const Restaurant = require("../models/Restaurant");
+const deliveryPartnerService = require("./deliveryPartnerService");
 const orderSocket = require("../socket/orderSocket");
+const DeliveryPartner = require("../models/DeliveryPartner");
 
 const getRestaurantOrders = async (ownerId) => {
     const restaurant =await Restaurant.findOne({ownerId});
@@ -109,7 +111,28 @@ const markOrderReady = async (ownerId,orderId,io) => {
 
     order.orderStatus ="READY_FOR_PICKUP";
     await order.save();
-    orderSocket.notifyOrderReady(io, order);
+    orderSocket.notifyOrderReady(io,order);
+    const deliveryPartners =await deliveryPartnerService.getNearestDeliveryPartners(
+        restaurant.location.coordinates[0],
+        restaurant.location.coordinates[1],
+        restaurant.deliveryRadius * 1000
+    );
+    await DeliveryPartner.updateMany(
+    {
+        _id: {
+            $in: deliveryPartners.map(
+                partner => partner._id
+            )
+        }
+    },
+    {
+        $inc: {
+            totalOrdersOffered: 1
+        }
+    }
+);
+    orderSocket.notifyNearbyDeliveryPartners(io,order,deliveryPartners);
+
     return order;
 };
 

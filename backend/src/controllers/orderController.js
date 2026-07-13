@@ -2,12 +2,14 @@ const orderService =require("../services/orderService");
 
 const placeOrder = async (req,res) => {
     try {
-        const order =await orderService.placeOrder(req.user.userId);
+        const order =await orderService.placeOrder(
+            req.user.userId
+        );
 
         res.status(201).json({
             success: true,
-            message:"Order placed successfully",
-            data: order
+            message:order.message,
+            data: order.data
         });
 
     } catch (error) {

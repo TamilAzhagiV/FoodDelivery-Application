@@ -1,14 +1,18 @@
-const express=require("express");
-const profileController=require('../controllers/profileController');
-const authMiddleware=require('../middleware/authMiddleware');
-const upload=require('../middleware/uploadMiddleware')
-const validate=require('../middleware/validate')
-const {updateProfileSchema} = require("../validations/profile/profile.request");
+const express = require("express");
+const router = express.Router();
 
-const router=express.Router();
+const profileController = require("../controllers/profileController");
 
-router.get('/',authMiddleware,profileController.getProfile);
-router.put("/",authMiddleware,
+const authMiddleware = require("../middleware/authMiddleware");
+const upload = require("../middleware/uploadMiddleware");
+const validate = require("../middleware/validate");
+
+const profileValidate = require("../validations/profile/profile.request");
+
+router.get("/",authMiddleware,profileController.getProfile);
+
+router.put("/",
+    authMiddleware,
     upload.fields([
         {
             name: "logo",
@@ -23,7 +27,12 @@ router.put("/",authMiddleware,
             maxCount: 1
         }
     ]),
-    validate(updateProfileSchema),
+    validate(profileValidate.updateProfileSchema),
     profileController.updateProfile
 );
-module.exports=router;
+
+router.patch("/change-password",authMiddleware,validate(profileValidate.changePasswordSchema),profileController.changePassword);
+router.delete("/",authMiddleware,validate(profileValidate.deleteAccountSchema),profileController.deleteAccount);
+router.post("/logout-all",authMiddleware,validate(profileValidate.logoutAllSchema),profileController.logoutAll);
+
+module.exports = router;

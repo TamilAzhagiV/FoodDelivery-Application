@@ -2,6 +2,7 @@ const { z } = require("zod");
 
 const emailSchema = require("../common/email.schema");
 const phoneSchema = require("../common/phone.schema");
+const passwordSchema = require("../common/password.schema");
 
 const getProfileSchema = z.object({});
 
@@ -81,7 +82,54 @@ const updateProfileSchema = z.object({
     }).strict()
 });
 
+const changePasswordSchema = {
+    body: z.object({
+        currentPassword: passwordSchema,
+
+        newPassword: passwordSchema,
+
+        confirmPassword: passwordSchema
+    })
+    .refine(
+        (data) =>
+            data.newPassword === data.confirmPassword,
+        {
+            message: "Confirm password does not match",
+            path: ["confirmPassword"]
+        }
+    )
+    .refine(
+        (data) =>
+            data.currentPassword !== data.newPassword,
+        {
+            message: "New password must be different from current password",
+            path: ["newPassword"]
+        }
+    ),
+
+    params: z.object({}),
+
+    query: z.object({})
+};
+
+const deleteAccountSchema = {
+    body: z.object({}),
+
+    params: z.object({}),
+
+    query: z.object({})
+};
+
+const logoutAllSchema = {
+    body: z.object({}),
+    params: z.object({}),
+    query: z.object({})
+};
+
 module.exports = {
     getProfileSchema,
-    updateProfileSchema
+    updateProfileSchema,
+    changePasswordSchema,
+    deleteAccountSchema,
+    logoutAllSchema
 };
